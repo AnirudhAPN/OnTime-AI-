@@ -65,14 +65,19 @@ import {
 import type { User as FirebaseUser } from './firebase';
 import { Soundscapes } from './components/Soundscapes';
 
+const formatToLocalDatetimeString = (date: Date): string => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 export default function App() {
-  // Use 2026-06-22 as the designated anchor time
-  const [systemTime, setSystemTime] = useState<Date>(() => new Date('2026-06-22T11:53:46-07:00'));
+  // Sync time according to the device
+  const [systemTime, setSystemTime] = useState<Date>(() => new Date());
   
-  // Real-time ticking relative to anchor
+  // Real-time ticking relative to the device's clock
   useEffect(() => {
     const timer = setInterval(() => {
-      setSystemTime(prev => new Date(prev.getTime() + 1000));
+      setSystemTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -170,7 +175,11 @@ export default function App() {
 
   // Form State
   const [taskTitle, setTaskTitle] = useState('');
-  const [taskDeadline, setTaskDeadline] = useState('2026-06-22T23:59');
+  const [taskDeadline, setTaskDeadline] = useState(() => {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T23:59`;
+  });
   const [taskImportance, setTaskImportance] = useState<'Critical' | 'High' | 'Medium' | 'Low'>('High');
   const [taskCategory, setTaskCategory] = useState<'Work' | 'Study' | 'Personal' | 'Health'>('Work');
   const [taskEffort, setTaskEffort] = useState('2h');
@@ -203,7 +212,11 @@ export default function App() {
       {
         id: 'task-1',
         title: 'Complete Final Security Audit Report',
-        deadline: '2026-06-22T16:00', // ~4 hours away !
+        deadline: (() => {
+          const d = new Date();
+          d.setHours(d.getHours() + 4);
+          return formatToLocalDatetimeString(d);
+        })(), // ~4 hours away !
         importance: 'Critical',
         category: 'Work',
         estimatedEffort: '2h',
@@ -213,7 +226,12 @@ export default function App() {
       {
         id: 'task-2',
         title: 'Prepare Slide Deck for Client Demo',
-        deadline: '2026-06-23T10:00', // ~22 hours away !
+        deadline: (() => {
+          const d = new Date();
+          d.setDate(d.getDate() + 1); // tomorrow
+          d.setHours(10, 0, 0, 0); // 10:00 AM
+          return formatToLocalDatetimeString(d);
+        })(), // ~22 hours away !
         importance: 'High',
         category: 'Work',
         estimatedEffort: '3h',
@@ -223,7 +241,11 @@ export default function App() {
       {
         id: 'task-3',
         title: 'Mindfulness & Cardio Strength Session',
-        deadline: '2026-06-22T21:30', // ~9.5 hours away
+        deadline: (() => {
+          const d = new Date();
+          d.setHours(21, 30, 0, 0); // today at 21:30
+          return formatToLocalDatetimeString(d);
+        })(), // ~9.5 hours away
         importance: 'Medium',
         category: 'Health',
         estimatedEffort: '1h',
@@ -233,7 +255,12 @@ export default function App() {
       {
         id: 'task-4',
         title: 'Draft Project Specs Proposal',
-        deadline: '2026-06-25T17:00', // 3 days away
+        deadline: (() => {
+          const d = new Date();
+          d.setDate(d.getDate() + 3); // 3 days away
+          d.setHours(17, 0, 0, 0); // 17:00
+          return formatToLocalDatetimeString(d);
+        })(), // 3 days away
         importance: 'Medium',
         category: 'Study',
         estimatedEffort: '4h',
