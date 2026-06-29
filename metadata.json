@@ -1,0 +1,6 @@
+{
+  "name": "OnTime AI",
+  "description": "An intelligent productivity companion that helps you plan, prioritize, schedule, and complete tasks before deadlines are missed using smart analytics and positive encouragement.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
